@@ -4,26 +4,46 @@
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Color Palette */
-  --bg-primary: #080b11;
-  --bg-secondary: #0f1624;
-  --bg-card: rgba(18, 26, 43, 0.75);
-  --bg-card-hover: rgba(24, 35, 58, 0.85);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(56, 189, 248, 0.3);
+  /* User Specified Light Palette */
+  --color-carbon: #1D1E18;        /* Carbon Black */
+  --color-dusty-olive: #6B8F71;   /* Dusty Olive */
+  --color-celadon: #AAD2BA;       /* Celadon */
+  --color-frozen-water: #D9FFF5;  /* Frozen Water */
+  --color-celadon-mint: #B9F5D8;  /* Celadon Mint */
 
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  /* Light Theme Surfaces */
+  --bg-primary: #f4faf7;          /* Crisp light mint-tinted base */
+  --bg-secondary: #eaf6ef;        /* Soft celadon-tinted section panel */
+  --bg-card: #ffffff;             /* Clean pure white card surface */
+  --bg-card-hover: #f0fbf5;       /* Delicate mint hover surface */
+  --bg-input: #ffffff;            /* Input backgrounds */
+  --bg-inset: #f3f9f5;            /* Inset panels, previews, code snippets */
 
-  --accent-cyan: #38bdf8;
-  --accent-indigo: #6366f1;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
+  /* Borders */
+  --border-subtle: rgba(107, 143, 113, 0.22); /* Subtle olive-celadon border */
+  --border-accent: #6B8F71;                   /* Primary dusty olive border */
+  --border-celadon: #AAD2BA;                  /* Soft celadon border */
 
-  --glow-cyan: rgba(56, 189, 248, 0.25);
-  --glow-emerald: rgba(16, 185, 129, 0.25);
+  /* Typography (High contrast for light theme) */
+  --text-primary: #1D1E18;        /* Carbon Black: headings and primary body text */
+  --text-secondary: #3d4a3f;      /* Deep olive-charcoal: secondary text (AAA contrast) */
+  --text-muted: #5e6f62;          /* Readable muted labels and metadata */
+
+  /* Brand Accents */
+  --accent-cyan: #4a7556;         /* Dusty olive tint for inline links & tags */
+  --accent-primary: #6B8F71;      /* Dusty Olive primary brand */
+  --accent-primary-hover: #55755b;/* Darker olive hover */
+  --accent-secondary: #AAD2BA;    /* Celadon secondary accent */
+  --accent-emerald: #247547;      /* Deep green for success indicators */
+  --accent-amber: #b45309;        /* Warm amber for pending states */
+  --accent-rose: #be123c;         /* High-contrast rose for errors/delete */
+
+  /* Glows and Shadows */
+  --glow-cyan: rgba(107, 143, 113, 0.25);
+  --glow-emerald: rgba(36, 117, 71, 0.2);
+  --shadow-sm: 0 1px 3px rgba(29, 30, 24, 0.06);
+  --shadow-md: 0 4px 14px rgba(29, 30, 24, 0.08);
+  --shadow-lg: 0 10px 28px rgba(29, 30, 24, 0.1);
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -47,8 +67,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   background-image: 
-    radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 85% 90%, rgba(99, 102, 241, 0.08) 0%, transparent 40%);
+    radial-gradient(circle at 10% 8%, rgba(217, 255, 245, 0.75) 0%, transparent 45%),
+    radial-gradient(circle at 90% 90%, rgba(185, 245, 216, 0.55) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(170, 210, 186, 0.18) 0%, transparent 60%);
+  background-attachment: fixed;
 }
 
 code, pre {
@@ -56,13 +78,14 @@ code, pre {
 }
 
 a {
-  color: var(--accent-cyan);
+  color: var(--color-dusty-olive);
   text-decoration: none;
+  font-weight: 500;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: #7dd3fc;
+  color: #48634d;
 }
 
 button {

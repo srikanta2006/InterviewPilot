@@ -208,11 +208,45 @@ This file records implementation evidence and explicit human approvals. The deve
   - [PASS] Full interview history persisted in SQLite, inspectable and deletable via dedicated UI (`test_interview_history_listing_and_deletion`).
   - [PASS] Verified citation inspection shows exact chunk text, scope, topic, and source ID.
 - Blockers: None
-- Human approval: PENDING
+- Human approval: APPROVED (Explicit user confirmation "update the readme and then lets start the phase 6")
 
 ### Phase 6 — Voice input, hardening, and portfolio delivery
-- Status: NOT STARTED
-- Human approval: NOT APPLICABLE
+- Status: COMPLETE
+- Date: 2026-10-28
+- Files created/modified:
+  - `README.md` (Updated comprehensively with complete architecture, features, 5-color light theme, repository structure, local startup commands, 76-test suite breakdown, offline/online Groq setup, and security guardrails)
+  - `frontend/src/components/InterviewWorkspace.jsx` (Implemented native Web Speech API voice speech-to-text with start/stop recording controls, animated microphone pulse, permission status detection, live interim transcript buffering, editable pre-submission text review, and clear actions)
+  - `frontend/src/components/InterviewWorkspace.css` (Glassmorphic light-theme voice toolbar, pulsating recording indicator, listening pill, permission warning banners, and interim transcript stream box)
+  - `frontend/src/App.jsx` (Updated header phase badge to Phase 6 Voice & Hardening)
+  - `backend/tests/test_hardening.py` (New test suite for prompt-injection safety in answers, zero secret exposure across endpoints, input sanitization of extreme payloads, and cascading session deletion safeguards)
+- Commands executed:
+  - `backend\.venv\Scripts\pytest.exe -v`: PASS (76/76 tests passed in 17.68s)
+  - `npm run lint` (in frontend): PASS (0 warnings, 0 errors via oxlint across 8 files in 51ms)
+  - `npm run build` (in frontend): PASS (Vite production bundle built in 219ms: 291.89 kB JS, 52.50 kB CSS)
+  - `git check-ignore -v backend/interviewpilot.db backend/.env`: PASS (verified excluded by `.gitignore`)
+- Acceptance criteria:
+  - [PASS] Voice is optional and does not block interview completion: candidates can record voice, speak, review and edit transcribed text, or type exclusively via keyboard.
+  - [PASS] Browser permission and speech recognition statuses (listening, denied, unsupported, idle) are clearly indicated with non-blocking fallback messages.
+  - [PASS] Prompt injection defenses validated: adversarial answers attempting instruction override cannot alter rubric bounds or fabricate chunk citations (`test_prompt_injection_safety_in_evaluator`).
+  - [PASS] Secret leakage safeguards: endpoints do not leak API keys, environment credentials, or private tokens (`test_no_secrets_in_endpoints`).
+  - [PASS] Session deletion cascades cleanly: verified 404 on missing sessions and clean cascade deletion of records from SQLite (`test_cascade_deletion_safeguards`).
+  - [PASS] All 76 automated core acceptance tests pass.
+  - [PASS] README contains comprehensive setup instructions, architecture notes, and limitations.
+- Blockers: None
+- Human approval: APPROVED (Explicit user confirmation "approved")
+
+---
+
+## Final Project Status
+All implementation phases defined in `MASTER_PLAN.md` (Phases 0 through 6) have been completed, verified with automated test suites, documented, and explicitly approved by the user.
+
+- **Phase 0 — Workspace inspection & project setup:** APPROVED
+- **Phase 1 — Document parsing & profile extraction:** APPROVED
+- **Phase 2 — Knowledge base & inspectable RAG:** APPROVED
+- **Phase 3 — Question generation & state machine:** APPROVED
+- **Phase 4 — Answer evaluation & scoring rubric:** APPROVED
+- **Phase 5 — Complete text interview & report UI:** APPROVED
+- **Phase 6 — Voice input, hardening, & portfolio delivery:** APPROVED
 
 ## Approval rule
 A phase must not be marked approved based on the agent's own judgment. Only an explicit user approval authorizes progression to the next phase.

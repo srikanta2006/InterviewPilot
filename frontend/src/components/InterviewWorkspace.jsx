@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { InterviewReport } from './InterviewReport'
 import './InterviewWorkspace.css'
 
@@ -62,6 +62,102 @@ export function InterviewWorkspace({
   const [evaluations, setEvaluations] = useState({}) // { [question_id]: EvaluationResult }
   const [finalReport, setFinalReport] = useState(null)
   const [loadingReport, setLoadingReport] = useState(false)
+
+  // Web Speech API Voice State (Phase 6)
+  const isVoiceSupported = typeof window !== 'undefined' && Boolean(window.SpeechRecognition || window.webkitSpeechRecognition)
+  const [isRecording, setIsRecording] = useState(false)
+  const [transcriptInterim, setTranscriptInterim] = useState('')
+  const [micStatus, setMicStatus] = useState(!isVoiceSupported ? 'unsupported' : 'idle')
+  const [voiceNotice, setVoiceNotice] = useState('')
+  const recognitionRef = useRef(null)
+
+  useEffect(() => {
+    if (!isVoiceSupported) return
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    const recognition = new SpeechRecognition()
+    recognition.continuous = true
+    recognition.interimResults = true
+    recognition.lang = 'en-US'
+
+    recognition.onstart = () => {
+      setIsRecording(true)
+      setMicStatus('listening')
+      setVoiceNotice('')
+    }
+
+    recognition.onresult = (event) => {
+      let interim = ''
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          const finalTranscript = event.results[i][0].transcript.trim()
+          if (finalTranscript) {
+            setCandidateAnswer((prev) => (prev ? `${prev.trim()} ${finalTranscript}` : finalTranscript))
+          }
+        } else {
+          interim += event.results[i][0].transcript
+        }
+      }
+      setTranscriptInterim(interim)
+    }
+
+    recognition.onerror = (event) => {
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        setMicStatus('denied')
+        setVoiceNotice('Microphone access was denied. You can continue typing your response in the text box.')
+      } else if (event.error === 'no-speech') {
+        // Natural pause in speech
+      } else {
+        setVoiceNotice(`Speech recognition status: ${event.error}`)
+      }
+      setIsRecording(false)
+    }
+
+    recognition.onend = () => {
+      setIsRecording(false)
+      setTranscriptInterim('')
+      setMicStatus((prev) => (prev === 'listening' ? 'idle' : prev))
+    }
+
+    recognitionRef.current = recognition
+
+    return () => {
+      try {
+        recognition.stop()
+      } catch {
+        // ignore
+      }
+    }
+  }, [isVoiceSupported])
+
+  const handleToggleVoice = () => {
+    if (!isVoiceSupported) return
+    setVoiceNotice('')
+    if (isRecording) {
+      try {
+        recognitionRef.current?.stop()
+      } catch {
+        // ignore
+      }
+      setIsRecording(false)
+      setMicStatus('idle')
+    } else {
+      try {
+        recognitionRef.current?.start()
+        setIsRecording(true)
+        setMicStatus('listening')
+      } catch (err) {
+        setVoiceNotice(`Could not activate microphone: ${err.message || 'Check browser permissions.'}`)
+        setMicStatus('error')
+        setIsRecording(false)
+      }
+    }
+  }
+
+  const handleClearAnswer = () => {
+    setCandidateAnswer('')
+    setTranscriptInterim('')
+  }
 
   // Load session if activeSessionId provided
   useEffect(() => {
@@ -575,15 +671,65 @@ export function InterviewWorkspace({
                 {/* Answer Submission Section */}
                 {!currentEval && (
                   <div className="answer-section">
-                    <div className="answer-header">
-                      <label htmlFor="candidate-answer">
-                        Candidate Answer:
-                      </label>
+                    <div className="voice-toolbar">
+                      <div className="voice-controls-group">
+                        {isVoiceSupported ? (
+                          <button
+                            type="button"
+                            id="btn-voice-toggle"
+                            className={`btn-voice ${isRecording ? 'recording' : ''}`}
+                            onClick={handleToggleVoice}
+                            disabled={evaluating}
+                            title={isRecording ? 'Click to stop recording' : 'Click to speak response'}
+                          >
+                            {isRecording ? (
+                              <>
+                                <span className="voice-record-pulse" />
+                                <span>⏹ Stop Recording</span>
+                              </>
+                            ) : (
+                              <>
+                                <span>🎙️ Record Answer with Voice</span>
+                              </>
+                            )}
+                          </button>
+                        ) : (
+                          <div className="voice-notice unsupported">
+                            ℹ️ Web Speech API not supported in this browser. Keyboard text input is ready.
+                          </div>
+                        )}
+
+                        {isRecording && (
+                          <div className="voice-listening-indicator">
+                            <span className="voice-pulse-dot" />
+                            <span>Listening... Speak response clearly</span>
+                          </div>
+                        )}
+
+                        {micStatus === 'denied' && (
+                          <div className="voice-notice denied">
+                            ⚠️ Mic permission denied (type below)
+                          </div>
+                        )}
+
+                        {candidateAnswer && (
+                          <button
+                            type="button"
+                            className="btn-sample btn-sample-weak"
+                            onClick={handleClearAnswer}
+                            disabled={evaluating || isRecording}
+                          >
+                            Clear Text
+                          </button>
+                        )}
+                      </div>
+
                       <div className="sample-answer-buttons">
                         <button
                           type="button"
                           className="btn-sample"
                           onClick={handleLoadSampleStrongAnswer}
+                          disabled={evaluating || isRecording}
                         >
                           ⚡ Load Strong Sample Answer
                         </button>
@@ -591,6 +737,7 @@ export function InterviewWorkspace({
                           type="button"
                           className="btn-sample btn-sample-weak"
                           onClick={handleLoadSampleWeakAnswer}
+                          disabled={evaluating || isRecording}
                         >
                           Load Brief Answer
                         </button>
@@ -600,11 +747,33 @@ export function InterviewWorkspace({
                       </div>
                     </div>
 
+                    {voiceNotice && (
+                      <div className="voice-alert-banner">
+                        {voiceNotice}
+                      </div>
+                    )}
+
+                    {transcriptInterim && (
+                      <div className="voice-interim-box">
+                        <span className="interim-label">Live Spoken Transcript:</span>
+                        <p className="interim-text">&quot;{transcriptInterim}...&quot;</p>
+                      </div>
+                    )}
+
+                    <div className="answer-header">
+                      <label htmlFor="candidate-answer">
+                        Candidate Answer (Voice transcribed & editable):
+                      </label>
+                      <span className="review-hint">
+                        💡 You can review and edit your transcribed answer below before submitting.
+                      </span>
+                    </div>
+
                     <textarea
                       id="candidate-answer"
                       className="answer-textarea"
                       rows={5}
-                      placeholder="Type candidate response here, or click a sample button above to test evaluation..."
+                      placeholder="Speak using the microphone above or type candidate response here..."
                       value={candidateAnswer}
                       onChange={(e) => setCandidateAnswer(e.target.value)}
                       disabled={evaluating}
@@ -616,7 +785,13 @@ export function InterviewWorkspace({
                       </div>
                       <button
                         className="btn-primary"
-                        onClick={() => handleSubmitAnswer(displayedQuestion.question_id)}
+                        onClick={() => {
+                          if (isRecording) {
+                            try { recognitionRef.current?.stop() } catch {}
+                            setIsRecording(false)
+                          }
+                          handleSubmitAnswer(displayedQuestion.question_id)
+                        }}
                         disabled={evaluating || !candidateAnswer.trim()}
                       >
                         {evaluating ? 'Evaluating Answer...' : '🔍 Evaluate Answer'}

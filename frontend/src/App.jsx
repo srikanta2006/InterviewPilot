@@ -90,8 +90,10 @@ function App() {
         </div>
 
         <div className="header-badges">
-          <span className="phase-pill">Phase 2 • Knowledge Base & RAG</span>
-          <span className="approval-pill">Approval: PENDING</span>
+          <span className="phase-pill">All Phases 0–6 Complete</span>
+          <span className="approval-pill" style={{ background: 'var(--color-celadon-mint)', borderColor: 'var(--color-celadon)', color: '#14532d' }}>
+            ✓ System: APPROVED
+          </span>
         </div>
       </header>
 
@@ -123,7 +125,7 @@ function App() {
             <button
               id="btn-toggle-diagnostics"
               className="ping-btn"
-              style={{ background: 'rgba(255, 255, 255, 0.08)', color: 'var(--text-secondary)' }}
+              style={{ background: '#ffffff', color: 'var(--color-carbon)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-sm)' }}
               onClick={() => setShowDiagnostics(!showDiagnostics)}
             >
               {showDiagnostics ? 'Hide Diagnostics' : 'System Specs'}
@@ -179,18 +181,11 @@ function App() {
       </div>
 
       {/* Main Workspace Navigation Tabs */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
         <button
           type="button"
           id="tab-btn-interview"
-          className="result-tab-btn"
-          style={{
-            padding: '10px 20px',
-            fontSize: '14px',
-            background: activeTab === 'interview' ? 'linear-gradient(135deg, #0284c7, #2563eb)' : 'rgba(255, 255, 255, 0.04)',
-            color: activeTab === 'interview' ? '#fff' : 'var(--text-secondary)',
-            borderColor: activeTab === 'interview' ? 'var(--accent-cyan)' : 'var(--border-subtle)',
-          }}
+          className={`nav-tab-btn ${activeTab === 'interview' ? 'active' : ''}`}
           onClick={() => {
             setActiveTab('interview')
             setResumeSessionId(null)
@@ -201,14 +196,7 @@ function App() {
         <button
           type="button"
           id="tab-btn-history"
-          className="result-tab-btn"
-          style={{
-            padding: '10px 20px',
-            fontSize: '14px',
-            background: activeTab === 'history' ? 'linear-gradient(135deg, #0284c7, #2563eb)' : 'rgba(255, 255, 255, 0.04)',
-            color: activeTab === 'history' ? '#fff' : 'var(--text-secondary)',
-            borderColor: activeTab === 'history' ? 'var(--accent-cyan)' : 'var(--border-subtle)',
-          }}
+          className={`nav-tab-btn ${activeTab === 'history' ? 'active' : ''}`}
           onClick={() => setActiveTab('history')}
         >
           📜 Past Sessions & Reports
@@ -216,32 +204,18 @@ function App() {
         <button
           type="button"
           id="tab-btn-knowledge"
-          className="result-tab-btn"
-          style={{
-            padding: '10px 20px',
-            fontSize: '14px',
-            background: activeTab === 'knowledge' ? 'linear-gradient(135deg, #0284c7, #2563eb)' : 'rgba(255, 255, 255, 0.04)',
-            color: activeTab === 'knowledge' ? '#fff' : 'var(--text-secondary)',
-            borderColor: activeTab === 'knowledge' ? 'var(--accent-cyan)' : 'var(--border-subtle)',
-          }}
+          className={`nav-tab-btn ${activeTab === 'knowledge' ? 'active' : ''}`}
           onClick={() => setActiveTab('knowledge')}
         >
-          🧠 Knowledge Base & RAG (Phase 2)
+          🧠 Knowledge Base & RAG
         </button>
         <button
           type="button"
           id="tab-btn-documents"
-          className="result-tab-btn"
-          style={{
-            padding: '10px 20px',
-            fontSize: '14px',
-            background: activeTab === 'profile' ? 'linear-gradient(135deg, #0284c7, #2563eb)' : 'rgba(255, 255, 255, 0.04)',
-            color: activeTab === 'profile' ? '#fff' : 'var(--text-secondary)',
-            borderColor: activeTab === 'profile' ? 'var(--accent-cyan)' : 'var(--border-subtle)',
-          }}
+          className={`nav-tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
           onClick={() => setActiveTab('profile')}
         >
-          📄 Document Parsing & Profile Setup (Phase 1)
+          📄 Document Parsing & Profile Setup
         </button>
       </div>
 
