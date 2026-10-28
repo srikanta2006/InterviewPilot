@@ -519,5 +519,9 @@ class InterviewOrchestrator:
         """Delete an interview session from SQLite."""
         return self.db.delete_session(session_id)
 
+    def clear_all_sessions(self) -> int:
+        """Clear all interview sessions from SQLite."""
+        return self.db.clear_all_sessions()
+
 
 

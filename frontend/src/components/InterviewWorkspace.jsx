@@ -47,6 +47,8 @@ export function InterviewWorkspace({
   apiBase = 'http://127.0.0.1:8000',
   onViewHistory = null,
   activeSessionId = null,
+  candidateProfile = null,
+  jobRequirements = null,
 }) {
   const [session, setSession] = useState(null)
   const [questions, setQuestions] = useState([])
@@ -57,7 +59,7 @@ export function InterviewWorkspace({
   const [evaluating, setEvaluating] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const [showCriteria, setShowCriteria] = useState(false)
-  const [showGrounding, setShowGrounding] = useState(true)
+  const [showGrounding, setShowGrounding] = useState(false)
   const [activeHistoryIndex, setActiveHistoryIndex] = useState(null)
   const [evaluations, setEvaluations] = useState({}) // { [question_id]: EvaluationResult }
   const [finalReport, setFinalReport] = useState(null)
@@ -207,13 +209,16 @@ export function InterviewWorkspace({
     setErrorMsg('')
     setFinalReport(null)
 
+    const activeProfile = candidateProfile || SAMPLE_PROFILE
+    const activeJob = jobRequirements || SAMPLE_JOB
+
     try {
       const response = await fetch(`${apiBase}/api/interviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          candidate_profile: SAMPLE_PROFILE,
-          job_requirements: SAMPLE_JOB,
+          candidate_profile: activeProfile,
+          job_requirements: activeJob,
           total_questions: totalQuestions,
         }),
       })
@@ -410,16 +415,6 @@ export function InterviewWorkspace({
         </div>
 
         <div className="header-actions">
-          {onViewHistory && (
-            <button
-              className="btn-secondary btn-sm"
-              onClick={onViewHistory}
-              title="View past interview practice sessions"
-            >
-              📜 Past Sessions
-            </button>
-          )}
-
           {!session ? (
             <div className="start-controls">
               <label className="question-count-label">
@@ -482,9 +477,18 @@ export function InterviewWorkspace({
       {/* Preflight Setup View */}
       {!session && (
         <div className="preflight-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, padding: '4px 10px', borderRadius: '6px', background: candidateProfile ? 'var(--color-celadon-mint)' : 'var(--color-frozen-water)', color: candidateProfile ? '#14532d' : 'var(--color-carbon)' }}>
+              {candidateProfile ? `✓ Active Profile: ${candidateProfile.full_name || 'Candidate'} (from Stage 1)` : '📋 Active Profile: Alex River (Default Sample)'}
+            </span>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+              {candidateProfile ? 'Parsed from uploaded resume' : 'Tip: Extract your custom resume in Stage 1'}
+            </span>
+          </div>
+
           <h3>Ready to start adaptive interview & rubric evaluation</h3>
           <p>
-            The orchestrator will formulate a competency plan for <strong>Alex River</strong> and <strong>Staff Platform Engineer at Nexus Technologies</strong>,
+            The orchestrator will formulate a competency plan for <strong>{(candidateProfile || SAMPLE_PROFILE).full_name || 'Candidate'}</strong> and <strong>{(jobRequirements || SAMPLE_JOB).job_title || 'Target Role'} at {(jobRequirements || SAMPLE_JOB).company || 'Target Company'}</strong>,
             query relevant reference chunks in ChromaDB, generate structured questions, and evaluate submitted answers against the agreed 4-dimension rubric.
           </p>
 
@@ -492,17 +496,18 @@ export function InterviewWorkspace({
             <div className="preflight-box">
               <div className="box-title">👤 Candidate Profile Preview</div>
               <ul>
-                <li><strong>Role:</strong> {SAMPLE_PROFILE.title}</li>
-                <li><strong>Experience:</strong> {SAMPLE_PROFILE.years_of_experience} Years</li>
-                <li><strong>Key Skills:</strong> {SAMPLE_PROFILE.primary_competencies.join(', ')}</li>
+                <li><strong>Candidate:</strong> {(candidateProfile || SAMPLE_PROFILE).full_name || 'Alex River'}</li>
+                <li><strong>Role:</strong> {(candidateProfile || SAMPLE_PROFILE).title || 'Software Engineer'}</li>
+                <li><strong>Experience:</strong> {(candidateProfile || SAMPLE_PROFILE).years_of_experience || '3+'} Years</li>
+                <li><strong>Key Skills:</strong> {((candidateProfile || SAMPLE_PROFILE).primary_competencies || []).slice(0, 4).join(', ') || 'General Engineering'}</li>
               </ul>
             </div>
             <div className="preflight-box">
               <div className="box-title">🎯 Target Job Requirements</div>
               <ul>
-                <li><strong>Role:</strong> {SAMPLE_JOB.job_title} ({SAMPLE_JOB.experience_level})</li>
-                <li><strong>Company:</strong> {SAMPLE_JOB.company}</li>
-                <li><strong>Core Competencies:</strong> {SAMPLE_JOB.core_competencies.join(', ')}</li>
+                <li><strong>Role:</strong> {(jobRequirements || SAMPLE_JOB).job_title} ({(jobRequirements || SAMPLE_JOB).experience_level || 'Mid-Senior'})</li>
+                <li><strong>Company:</strong> {(jobRequirements || SAMPLE_JOB).company || 'Target Company'}</li>
+                <li><strong>Core Competencies:</strong> {((jobRequirements || SAMPLE_JOB).core_competencies || []).slice(0, 4).join(', ') || 'General Engineering'}</li>
               </ul>
             </div>
           </div>
@@ -779,10 +784,7 @@ export function InterviewWorkspace({
                       disabled={evaluating}
                     />
 
-                    <div className="action-row">
-                      <div className="state-info">
-                        Status: <code>{session.status}</code>
-                      </div>
+                    <div className="action-row" style={{ justifyContent: 'flex-end' }}>
                       <button
                         className="btn-primary"
                         onClick={() => {
@@ -815,9 +817,6 @@ export function InterviewWorkspace({
                         <span className={`eval-status-badge status-${currentEval.evaluation_status}`}>
                           {currentEval.evaluation_status}
                         </span>
-                        <div className="eval-formula-text">
-                          Formula: (Correctness*30 + Completeness*30 + Relevance*20 + Clarity*20) / 5
-                        </div>
                       </div>
                     </div>
 

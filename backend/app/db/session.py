@@ -217,6 +217,11 @@ class DatabaseManager:
             cursor = conn.execute("DELETE FROM sessions WHERE session_id = ?;", (session_id,))
             return cursor.rowcount > 0
 
+    def clear_all_sessions(self) -> int:
+        with self.get_connection() as conn:
+            cursor = conn.execute("DELETE FROM sessions;")
+            return cursor.rowcount
+
 
     # --- Question Operations ---
 

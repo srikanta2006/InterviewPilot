@@ -41,7 +41,12 @@ Responsibilities:
 - Design reliable relational database schemas and optimize system throughput.
 - Mentor engineers and participate in architecture design reviews.`
 
-export function DocumentSetup({ onParsed, apiBase = 'http://127.0.0.1:8000' }) {
+export function DocumentSetup({
+  onParsed,
+  apiBase = 'http://127.0.0.1:8000',
+  onProceedToKnowledge = null,
+  onProceedToInterview = null,
+}) {
   // Input modes: 'file' | 'text'
   const [resumeMode, setResumeMode] = useState('text')
   const [resumeText, setResumeText] = useState(SAMPLE_RESUME_TEXT)
@@ -314,17 +319,11 @@ export function DocumentSetup({ onParsed, apiBase = 'http://127.0.0.1:8000' }) {
       {/* Extracted Structured Results */}
       {parseResult && (
         <section id="parsed-results-section" className="results-container">
-          {/* Result Metadata Banner */}
+          {/* Result Header & Tabs */}
           <div className="results-header">
             <div className="results-badge-group">
-              <span className={`method-badge ${parseResult.extraction_method}`}>
-                Engine: {parseResult.extraction_method === 'groq' ? 'Groq LLM (llama-3.3-70b)' : 'Deterministic Local Heuristics'}
-              </span>
-              <span className="stat-pill">
-                Resume: {parseResult.stats.resume_char_count} chars
-              </span>
-              <span className="stat-pill">
-                Job Spec: {parseResult.stats.job_description_char_count} chars
+              <span className="method-badge" style={{ background: 'var(--color-celadon-mint)', color: '#14532d', borderColor: 'var(--color-celadon)' }}>
+                ✓ Successfully Structured
               </span>
             </div>
 
@@ -342,13 +341,6 @@ export function DocumentSetup({ onParsed, apiBase = 'http://127.0.0.1:8000' }) {
                 onClick={() => setActiveTab('job')}
               >
                 Job Requirements
-              </button>
-              <button
-                type="button"
-                className={`result-tab-btn ${activeTab === 'json' ? 'active' : ''}`}
-                onClick={() => setActiveTab('json')}
-              >
-                Raw JSON Schema
               </button>
             </div>
           </div>
@@ -480,6 +472,38 @@ export function DocumentSetup({ onParsed, apiBase = 'http://127.0.0.1:8000' }) {
               <pre className="json-pre">{JSON.stringify(parseResult, null, 2)}</pre>
             </div>
           )}
+
+          {/* Stage 1 Completion Next Steps */}
+          <div style={{ marginTop: '24px', padding: '18px 22px', background: 'var(--color-frozen-water)', border: '1px solid var(--color-celadon)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
+            <div>
+              <strong style={{ color: 'var(--color-carbon)', fontSize: '15px' }}>✓ Stage 1 Complete: Candidate profile & job specifications extracted!</strong>
+              <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#334155' }}>
+                Profile data is now loaded. You can verify ChromaDB evidence in Stage 2 or start the interview workspace in Stage 3.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {onProceedToKnowledge && (
+                <button
+                  type="button"
+                  id="btn-goto-stage2"
+                  className="btn-primary"
+                  onClick={onProceedToKnowledge}
+                >
+                  Proceed to Knowledge Base (Stage 2) →
+                </button>
+              )}
+              {onProceedToInterview && (
+                <button
+                  type="button"
+                  id="btn-goto-stage3"
+                  className="btn-secondary"
+                  onClick={onProceedToInterview}
+                >
+                  Launch Interview Workspace (Stage 3) →
+                </button>
+              )}
+            </div>
+          </div>
         </section>
       )}
     </div>

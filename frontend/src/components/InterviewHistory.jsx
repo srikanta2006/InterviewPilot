@@ -88,6 +88,28 @@ export function InterviewHistory({ apiBase = 'http://127.0.0.1:8000', onResumeSe
     }
   }
 
+  const handleClearAllSessions = async () => {
+    if (!window.confirm('Delete all past interview sessions? This cannot be undone.')) {
+      return
+    }
+    setLoading(true)
+    setErrorMsg('')
+    try {
+      const response = await fetch(`${apiBase}/api/interviews`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to clear history (HTTP ${response.status})`)
+      }
+      setSessions([])
+      setSelectedReport(null)
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to clear history')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // If viewing a report from history
   if (selectedReport) {
     return (
@@ -106,13 +128,18 @@ export function InterviewHistory({ apiBase = 'http://127.0.0.1:8000', onResumeSe
       {/* Header */}
       <div className="history-header">
         <div>
-          <h2>📜 Interview Practice History</h2>
-          <p>Local SQLite interview sessions, rubric evaluations, and generated performance reports.</p>
+          <h2>📜 Session History & Performance Reports</h2>
+          <p>Review past interview attempts, 4-dimension rubric evaluations, and downloadable reports.</p>
         </div>
         <div className="history-actions">
           <button className="btn-secondary btn-sm" onClick={handleRefresh} disabled={loading}>
             🔄 Refresh
           </button>
+          {sessions.length > 0 && (
+            <button className="btn-secondary btn-sm" onClick={handleClearAllSessions} disabled={loading} title="Delete all past sessions">
+              🗑️ Clear All
+            </button>
+          )}
           {onStartNew && (
             <button className="btn-primary btn-sm" onClick={onStartNew}>
               🚀 Start New Interview

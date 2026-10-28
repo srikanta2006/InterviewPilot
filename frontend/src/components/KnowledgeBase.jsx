@@ -8,7 +8,7 @@ const SAMPLE_QUERIES = [
   { label: 'Platform Architecture SLOs', query: 'What are the latency SLOs and evidence requirements for Nexus platform?', scope: 'job_specific' },
 ]
 
-export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000' }) {
+export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToInterview = null }) {
   const [documents, setDocuments] = useState([])
   const [loadingDocs, setLoadingDocs] = useState(true)
   const [seeding, setSeeding] = useState(false)
@@ -220,6 +220,26 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000' }) {
         </div>
       </div>
 
+      {/* Stage 2 Workflow Banner */}
+      <div style={{ marginBottom: '20px', padding: '14px 20px', background: 'var(--color-frozen-water)', border: '1px solid var(--color-celadon)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <strong style={{ color: 'var(--color-carbon)' }}>🧠 Stage 2: Technical Knowledge Base & Vector RAG</strong>
+          <p style={{ margin: '3px 0 0 0', fontSize: '13px', color: '#334155' }}>
+            Seed or inspect reference chunks. All generated interview questions are grounded in this corpus.
+          </p>
+        </div>
+        {onProceedToInterview && (
+          <button
+            type="button"
+            id="btn-goto-interview-from-kb"
+            className="btn-primary"
+            onClick={onProceedToInterview}
+          >
+            🚀 Proceed to Interview Workspace (Stage 3) →
+          </button>
+        )}
+      </div>
+
       {statusMsg && (
         <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#6ee7b7', padding: '12px 16px', borderRadius: '8px', marginBottom: '18px', fontSize: '13px' }}>
           ✓ {statusMsg}
@@ -405,6 +425,26 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000' }) {
             </div>
           </form>
         </div>
+      </div>
+
+      {/* Stage 2 Workflow Banner */}
+      <div style={{ marginBottom: '20px', padding: '14px 20px', background: 'var(--color-frozen-water)', border: '1px solid var(--color-celadon)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <strong style={{ color: 'var(--color-carbon)' }}>🧠 Stage 2: Technical Knowledge Base & Vector RAG</strong>
+          <p style={{ margin: '3px 0 0 0', fontSize: '13px', color: '#334155' }}>
+            Seed or inspect reference chunks. All generated interview questions are grounded in this corpus.
+          </p>
+        </div>
+        {onProceedToInterview && (
+          <button
+            type="button"
+            id="btn-goto-interview-from-kb"
+            className="btn-primary"
+            onClick={onProceedToInterview}
+          >
+            🚀 Proceed to Interview Workspace (Stage 3) →
+          </button>
+        )}
       </div>
 
       {/* Retrieved Evidence Results */}

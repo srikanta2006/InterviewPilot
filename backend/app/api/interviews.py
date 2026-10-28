@@ -263,6 +263,16 @@ def get_session_report(
 
 
 @router.delete(
+    "",
+    summary="Delete all interview sessions and clear history",
+)
+def clear_all_sessions():
+    """Purge all sessions, questions, and evaluations from SQLite."""
+    deleted_count = orchestrator.clear_all_sessions()
+    return {"success": True, "deleted_count": deleted_count}
+
+
+@router.delete(
     "/{session_id}",
     summary="Delete an interview session from SQLite",
 )
