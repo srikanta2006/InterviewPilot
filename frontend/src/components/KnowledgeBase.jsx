@@ -64,7 +64,7 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
   }
 
   const handleDelete = async (docId) => {
-    if (!window.confirm(`Delete document '${docId}' and all its vector chunks?`)) return
+    if (!window.confirm(`Delete document '${docId}' from the reference library?`)) return
     setErrorMsg('')
     try {
       const res = await fetch(`${apiBase}/api/knowledge/documents/${docId}`, { method: 'DELETE' })
@@ -104,13 +104,13 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
       const data = await res.json()
-      setStatusMsg(`Document '${data.document_id}' ${data.status} with ${data.chunks_created} chunks.`)
+      setStatusMsg(`Added '${data.document_id}' to reference library (${data.chunks_created} sections).`)
       setNewTitle('')
       setNewText('')
       setShowIngestForm(false)
       await fetchDocuments()
     } catch (err) {
-      setErrorMsg(`Ingestion failed: ${err.message}`)
+      setErrorMsg(`Failed to save document: ${err.message}`)
     } finally {
       setIngesting(false)
     }
@@ -184,10 +184,9 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
       {/* Header */}
       <div className="kb-header">
         <div>
-          <h2 className="kb-title">Curated Knowledge Base & RAG Inspector</h2>
+          <h2 className="kb-title">Technical Reference Library</h2>
           <p className="kb-subtitle">
-            Inspect ChromaDB persistent vector retrieval independently from generation.
-            Embeddings are computed using local sentence-transformers with scope-filtered similarity search.
+            Browse engineering concepts, architectural patterns, and standards used to generate questions and evaluate candidate responses.
           </p>
         </div>
         <div className="kb-actions">
@@ -198,7 +197,7 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
             onClick={handleSeedDefaults}
             disabled={seeding}
           >
-            {seeding ? '⚡ Seeding Corpus...' : '⚡ Seed Default Technical Corpus'}
+            {seeding ? '⚡ Loading Topics...' : '⚡ Load Core Engineering Topics'}
           </button>
           <button
             type="button"
@@ -206,7 +205,7 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
             className="btn-secondary"
             onClick={() => setShowIngestForm(!showIngestForm)}
           >
-            {showIngestForm ? '✕ Close Ingest Form' : '➕ Ingest Document'}
+            {showIngestForm ? '✕ Close Form' : '➕ Add Custom Reference'}
           </button>
           <button
             type="button"
@@ -220,12 +219,12 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
         </div>
       </div>
 
-      {/* Stage 2 Workflow Banner */}
+      {/* Reference Library Guidance Banner */}
       <div style={{ marginBottom: '20px', padding: '14px 20px', background: 'var(--color-frozen-water)', border: '1px solid var(--color-celadon)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <strong style={{ color: 'var(--color-carbon)' }}>🧠 Stage 2: Technical Knowledge Base & Vector RAG</strong>
+          <strong style={{ color: 'var(--color-carbon)' }}>📚 Technical Reference & Knowledge Base</strong>
           <p style={{ margin: '3px 0 0 0', fontSize: '13px', color: '#334155' }}>
-            Seed or inspect reference chunks. All generated interview questions are grounded in this corpus.
+            Explore reference topics or test search queries. Questions in your practice interview are aligned with this library.
           </p>
         </div>
         {onProceedToInterview && (
@@ -235,7 +234,7 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
             className="btn-primary"
             onClick={onProceedToInterview}
           >
-            🚀 Proceed to Interview Workspace (Stage 3) →
+            Start Practice Interview →
           </button>
         )}
       </div>
@@ -256,7 +255,7 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
       {showIngestForm && (
         <form onSubmit={handleIngest} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '14px', color: 'var(--accent-cyan)' }}>
-            Ingest Custom Reference Document
+            Add Custom Reference Document
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px', marginBottom: '14px' }}>
             <div>
@@ -273,8 +272,8 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
             <div>
               <label style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Scope</label>
               <select className="filter-select" style={{ width: '100%', height: '42px' }} value={newScope} onChange={(e) => setNewScope(e.target.value)}>
-                <option value="shared">Shared Technical Corpus</option>
-                <option value="job_specific">Job-Specific Reference</option>
+                <option value="shared">General Technical Concept</option>
+                <option value="job_specific">Role-Specific Reference</option>
               </select>
             </div>
             <div>
@@ -303,28 +302,28 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
             <button type="button" className="btn-secondary" onClick={() => setShowIngestForm(false)}>Cancel</button>
             <button type="submit" className="btn-primary" disabled={ingesting}>
-              {ingesting ? 'Chunking & Indexing...' : 'Add to ChromaDB'}
+              {ingesting ? 'Saving...' : 'Save to Library'}
             </button>
           </div>
         </form>
       )}
 
-      {/* Two Column Section: Document Index & Live Vector Inspector */}
+      {/* Two Column Section: Document Index & Live Search */}
       <div className="kb-grid">
         {/* Left: Indexed Documents Directory */}
         <div className="kb-panel">
           <div className="kb-panel-title">
             <span>📚</span>
-            <span>Indexed Documents ({documents.length})</span>
+            <span>Reference Library Documents ({documents.length})</span>
           </div>
 
           {loadingDocs ? (
-            <div style={{ color: 'var(--text-muted)', fontSize: '13px', padding: '20px 0' }}>Loading indexed documents...</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '13px', padding: '20px 0' }}>Loading reference documents...</div>
           ) : documents.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '36px 16px', color: 'var(--text-muted)' }}>
-              <p style={{ marginBottom: '14px', fontSize: '13.5px' }}>No documents currently indexed in ChromaDB.</p>
+              <p style={{ marginBottom: '14px', fontSize: '13.5px' }}>No reference documents currently loaded.</p>
               <button type="button" className="btn-secondary" onClick={handleSeedDefaults} disabled={seeding}>
-                ⚡ Seed Default Technical Corpus
+                ⚡ Load Core Engineering Topics
               </button>
             </div>
           ) : (
@@ -337,7 +336,7 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
                       <span className={`scope-badge ${doc.scope}`}>{doc.scope}</span>
                       <span>Topic: <strong>{doc.topic}</strong></span>
                       <span>•</span>
-                      <span>{doc.chunks_count} chunk{doc.chunks_count === 1 ? '' : 's'}</span>
+                      <span>{doc.chunks_count} section{doc.chunks_count === 1 ? '' : 's'}</span>
                     </div>
                   </div>
                   <button
@@ -358,7 +357,7 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
         <div className="kb-panel">
           <div className="kb-panel-title">
             <span>🔍</span>
-            <span>Inspectable Similarity Query</span>
+            <span>Search Reference Library</span>
           </div>
 
           <form onSubmit={handleSearchSubmit} className="search-controls">
@@ -379,9 +378,9 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
                 value={searchScope}
                 onChange={(e) => setSearchScope(e.target.value)}
               >
-                <option value="">All Scopes (Shared + Job-Specific)</option>
-                <option value="shared">Scope: Shared Technical Corpus Only</option>
-                <option value="job_specific">Scope: Job-Specific References Only</option>
+                <option value="">All Topics (General + Role-Specific)</option>
+                <option value="shared">General Topics Only</option>
+                <option value="job_specific">Role-Specific References Only</option>
               </select>
 
               <select
@@ -390,9 +389,9 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
                 value={topK}
                 onChange={(e) => setTopK(e.target.value)}
               >
-                <option value={3}>Top 3 Chunks</option>
-                <option value={5}>Top 5 Chunks (Default)</option>
-                <option value={10}>Top 10 Chunks</option>
+                <option value={3}>Top 3 Results</option>
+                <option value={5}>Top 5 Results</option>
+                <option value={10}>Top 10 Results</option>
               </select>
 
               <button
@@ -402,13 +401,13 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
                 style={{ marginLeft: 'auto', padding: '8px 20px', fontSize: '13px' }}
                 disabled={searching}
               >
-                {searching ? 'Querying...' : 'Search Evidence'}
+                {searching ? 'Searching...' : 'Search Library'}
               </button>
             </div>
 
             <div>
               <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>
-                Quick Evaluation Benchmarks:
+                Explore Sample Topics:
               </span>
               <div className="sample-queries-row">
                 {SAMPLE_QUERIES.map((item, idx) => (
@@ -427,33 +426,13 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
         </div>
       </div>
 
-      {/* Stage 2 Workflow Banner */}
-      <div style={{ marginBottom: '20px', padding: '14px 20px', background: 'var(--color-frozen-water)', border: '1px solid var(--color-celadon)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <strong style={{ color: 'var(--color-carbon)' }}>🧠 Stage 2: Technical Knowledge Base & Vector RAG</strong>
-          <p style={{ margin: '3px 0 0 0', fontSize: '13px', color: '#334155' }}>
-            Seed or inspect reference chunks. All generated interview questions are grounded in this corpus.
-          </p>
-        </div>
-        {onProceedToInterview && (
-          <button
-            type="button"
-            id="btn-goto-interview-from-kb"
-            className="btn-primary"
-            onClick={onProceedToInterview}
-          >
-            🚀 Proceed to Interview Workspace (Stage 3) →
-          </button>
-        )}
-      </div>
-
-      {/* Retrieved Evidence Results */}
+      {/* Retrieved Reference Results */}
       {searchResults && (
         <div id="rag-results-section" className="retrieval-results-section">
           <div className="retrieval-results-header">
             <div>
               <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                Retrieved Reference Evidence
+                Matched Reference Material
               </h3>
               <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
                 Query: <em>"{searchResults.query}"</em>
@@ -461,32 +440,32 @@ export function KnowledgeBase({ apiBase = 'http://127.0.0.1:8000', onProceedToIn
               </p>
             </div>
             <span className="results-count-pill">
-              {searchResults.total_results} evidence chunk{searchResults.total_results === 1 ? '' : 's'} retrieved
+              {searchResults.total_results} relevant section{searchResults.total_results === 1 ? '' : 's'} found
             </span>
           </div>
 
           {searchResults.results.length === 0 ? (
             <div style={{ color: 'var(--text-muted)', fontSize: '13.5px', textAlign: 'center', padding: '24px 0' }}>
-              No relevant chunks found matching this query and filter criteria.
+              No matching reference material found.
             </div>
           ) : (
             searchResults.results.map((item, idx) => (
               <div key={item.chunk_id || idx} className="chunk-card">
                 <div className="chunk-card-header">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <span className="chunk-id-tag">{item.chunk_id}</span>
+                    <span className="chunk-id-tag">Section #{item.chunk_index + 1}</span>
                     <span className={`scope-badge ${item.scope}`}>{item.scope}</span>
                     <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text-primary)' }}>
                       {item.source_name}
                     </span>
                   </div>
                   <div className="similarity-score-pill">
-                    {(item.similarity_score * 100).toFixed(1)}% Match (dist: {item.distance})
+                    {(item.similarity_score * 100).toFixed(1)}% Match
                   </div>
                 </div>
 
                 <div className="chunk-source-provenance">
-                  Topic: <strong>{item.topic}</strong> • Chunk #{item.chunk_index + 1}
+                  Topic: <strong>{item.topic}</strong> • Section #{item.chunk_index + 1}
                 </div>
 
                 <div className="chunk-body">

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { InterviewReport } from './InterviewReport'
+import { MarkdownView } from './MarkdownView'
 import './InterviewWorkspace.css'
 
 
@@ -479,17 +480,17 @@ export function InterviewWorkspace({
         <div className="preflight-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
             <span style={{ fontSize: '12px', fontWeight: 700, padding: '4px 10px', borderRadius: '6px', background: candidateProfile ? 'var(--color-celadon-mint)' : 'var(--color-frozen-water)', color: candidateProfile ? '#14532d' : 'var(--color-carbon)' }}>
-              {candidateProfile ? `✓ Active Profile: ${candidateProfile.full_name || 'Candidate'} (from Stage 1)` : '📋 Active Profile: Alex River (Default Sample)'}
+              {candidateProfile ? `✓ Active Profile: ${candidateProfile.full_name || 'Candidate'}` : '📋 Active Profile: Alex River (Sample Profile)'}
             </span>
             <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-              {candidateProfile ? 'Parsed from uploaded resume' : 'Tip: Extract your custom resume in Stage 1'}
+              {candidateProfile ? 'Configured from Profile Setup' : 'Tip: You can customize your background in Profile Setup'}
             </span>
           </div>
 
-          <h3>Ready to start adaptive interview & rubric evaluation</h3>
+          <h3>Adaptive Technical Interview Preparation</h3>
           <p>
-            The orchestrator will formulate a competency plan for <strong>{(candidateProfile || SAMPLE_PROFILE).full_name || 'Candidate'}</strong> and <strong>{(jobRequirements || SAMPLE_JOB).job_title || 'Target Role'} at {(jobRequirements || SAMPLE_JOB).company || 'Target Company'}</strong>,
-            query relevant reference chunks in ChromaDB, generate structured questions, and evaluate submitted answers against the agreed 4-dimension rubric.
+            You will be interviewed for <strong>{(jobRequirements || SAMPLE_JOB).job_title || 'Target Role'} at {(jobRequirements || SAMPLE_JOB).company || 'Target Company'}</strong> based on <strong>{(candidateProfile || SAMPLE_PROFILE).full_name || 'Candidate'}</strong>'s technical background.
+            Questions will challenge your engineering depth across key competencies with immediate rubric-based evaluations.
           </p>
 
           <div className="preflight-grid">
@@ -605,7 +606,7 @@ export function InterviewWorkspace({
 
                 {/* Question Text */}
                 <div className="question-body">
-                  <p className="question-text">{displayedQuestion.question_text}</p>
+                  <MarkdownView content={displayedQuestion.question_text} className="question-markdown" />
                 </div>
 
                 {/* Grounding & Evidence Section */}
@@ -614,21 +615,21 @@ export function InterviewWorkspace({
                     className="grounding-header"
                     onClick={() => setShowGrounding(!showGrounding)}
                   >
-                    <span>🛡️ Verified Retrieved Sources ({displayedQuestion.retrieved_chunk_ids?.length || 0})</span>
-                    <span className="toggle-indicator">{showGrounding ? '▲ Hide' : '▼ Inspect Evidence'}</span>
+                    <span>📚 Reference Context & Materials ({displayedQuestion.retrieved_chunk_ids?.length || 0})</span>
+                    <span className="toggle-indicator">{showGrounding ? '▲ Hide' : '▼ View References'}</span>
                   </div>
 
                   {showGrounding && (
                     <div className="grounding-content">
                       <p className="grounding-disclaimer">
-                        Evidence chunks retrieved from ChromaDB vector store. The model cannot fabricate chunk IDs.
+                        Key domain references and architectural standards informing this question:
                       </p>
                       <div className="chunk-list">
                         {displayedQuestion.retrieved_context?.length > 0 ? (
                           displayedQuestion.retrieved_context.map((chunk, cIdx) => (
                             <div key={cIdx} className="chunk-item">
                               <div className="chunk-meta">
-                                <span className="chunk-id-tag">{chunk.chunk_id}</span>
+                                <span className="chunk-id-tag">Reference</span>
                                 <span className="chunk-source-name">{chunk.source_name}</span>
                                 <span className="chunk-topic">{chunk.topic}</span>
                               </div>
@@ -639,7 +640,7 @@ export function InterviewWorkspace({
                           ))
                         ) : (
                           <div className="no-chunks-notice">
-                            No specific reference chunks matched; question generated from foundational technical standards.
+                            Question formulated using foundational engineering standards for this role.
                           </div>
                         )}
                       </div>
@@ -653,8 +654,8 @@ export function InterviewWorkspace({
                     className="criteria-header"
                     onClick={() => setShowCriteria(!showCriteria)}
                   >
-                    <span>📋 Expected Technical Concepts ({displayedQuestion.expected_criteria?.length || 0})</span>
-                    <span className="toggle-indicator">{showCriteria ? '▲ Hide' : '▼ Show Rubric Criteria'}</span>
+                    <span>🎯 Evaluation Criteria & Focus Areas ({displayedQuestion.expected_criteria?.length || 0})</span>
+                    <span className="toggle-indicator">{showCriteria ? '▲ Hide' : '▼ View Criteria'}</span>
                   </div>
 
                   {showCriteria && (
@@ -666,7 +667,7 @@ export function InterviewWorkspace({
                       </ul>
                       {displayedQuestion.follow_up_rationale && (
                         <div className="rationale-box">
-                          <strong>Orchestrator Rationale:</strong> {displayedQuestion.follow_up_rationale}
+                          <strong>Question Focus:</strong> {displayedQuestion.follow_up_rationale}
                         </div>
                       )}
                     </div>
@@ -911,17 +912,16 @@ export function InterviewWorkspace({
                     {/* Actionable Feedback */}
                     <div className="actionable-box">
                       <strong>💡 Actionable Coaching Feedback:</strong>
-                      <p>{currentEval.actionable_feedback}</p>
+                      <MarkdownView content={currentEval.actionable_feedback} className="eval-feedback-markdown" />
                     </div>
 
                     {/* Citations Grounding */}
                     {currentEval.citations?.length > 0 && (
                       <div className="eval-citations-box">
-                        <strong>📚 Grounded Evidence Citations ({currentEval.citations.length}):</strong>
+                        <strong>📚 Reference Standards ({currentEval.citations.length}):</strong>
                         <div className="citation-pills">
                           {currentEval.citations.map((cit, cIdx) => (
                             <div key={cIdx} className="citation-badge">
-                              <code>{cit.chunk_id}</code>
                               <span>{cit.source_name}</span>
                             </div>
                           ))}

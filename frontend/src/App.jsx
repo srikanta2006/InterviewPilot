@@ -78,7 +78,7 @@ function App() {
         </div>
       </header>
 
-      {/* Main Workspace Navigation Tabs - Ordered Stage 1 through Stage 4 */}
+      {/* Main Workspace Navigation Tabs */}
       <nav className="nav-tabs-bar">
         <button
           type="button"
@@ -86,7 +86,7 @@ function App() {
           className={`nav-tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
           onClick={() => setActiveTab('profile')}
         >
-          📄 1. Candidate & Job Setup
+          📄 Profile Setup
         </button>
         <button
           type="button"
@@ -94,7 +94,7 @@ function App() {
           className={`nav-tab-btn ${activeTab === 'knowledge' ? 'active' : ''}`}
           onClick={() => setActiveTab('knowledge')}
         >
-          🧠 2. Knowledge Base (RAG)
+          🧠 Reference Library
         </button>
         <button
           type="button"
@@ -105,7 +105,7 @@ function App() {
             setResumeSessionId(null)
           }}
         >
-          🎙️ 3. Practice Interview
+          🎙️ Practice Interview
         </button>
         <button
           type="button"
@@ -113,7 +113,7 @@ function App() {
           className={`nav-tab-btn ${activeTab === 'history' ? 'active' : ''}`}
           onClick={() => setActiveTab('history')}
         >
-          📜 4. Session History
+          📜 History & Reports
         </button>
       </nav>
 
@@ -156,7 +156,7 @@ function App() {
 
       {/* Clean Minimal Product Footer */}
       <footer className="app-footer-clean">
-        <p>InterviewPilot — Adaptive AI Technical Interviews Grounded in Real Architectural References</p>
+        <p>InterviewPilot — AI Technical Interview Preparation Platform</p>
       </footer>
     </div>
   )

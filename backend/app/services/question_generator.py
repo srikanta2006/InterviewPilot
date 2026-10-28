@@ -205,7 +205,14 @@ class QuestionGenerator:
             "3. Focus on architectural trade-offs, edge cases, performance, or concrete design decisions.\n"
             "4. NEVER repeat or rephrase topics already asked in previous questions.\n"
             "5. List 3 to 5 clear expected criteria/key concepts that an ideal answer must demonstrate.\n"
-            "6. Output MUST be valid JSON adhering strictly to the schema."
+            "6. QUESTION FORMATTING:\n"
+            "   - Format 'question_text' cleanly using structured Markdown:\n"
+            "     * **Scenario:** A crisp 1-2 sentence real-world engineering situation or production context.\n"
+            "     * **Technical Constraints:** Bullet points highlighting constraints, traffic scale, or trade-offs.\n"
+            "     * **Question:** A direct, focused technical prompt for the candidate.\n"
+            "   - Use backticks around code symbols, keywords, or APIs (e.g. `async def`, `Depends`, `Redis`, `useEffect`).\n"
+            "   - Always use double line breaks between sections so the question renders as readable paragraphs instead of a continuous text block.\n"
+            "7. Output MUST be valid JSON adhering strictly to the schema."
         )
 
         # Build context excerpt block
@@ -242,7 +249,7 @@ Retrieved Technical Reference Documentation:
 {context_block if context_block else 'General industry best practices and core engineering principles.'}
 
 Please output a JSON object with:
-- "question_text": The scenario-based interview question.
+- "question_text": The scenario-based interview question, formatted in clean Markdown with **Scenario:**, **Technical Constraints:** (bullet points), and **Question:** sections with code backticks.
 - "expected_criteria": Array of 3-5 key technical concepts/trade-offs the candidate should cover.
 - "follow_up_rationale": Short explanation of why this question fits this competency and difficulty.
 """
@@ -278,8 +285,11 @@ Please output a JSON object with:
         if "python" in comp_lower or "fastapi" in comp_lower or "async" in comp_lower:
             if difficulty == "Easy":
                 q_text = (
-                    "In FastAPI and asynchronous Python, how does dependency injection with `Depends` work, "
-                    "and how does FastAPI manage the lifecycle and cleanup of database connections or resources per request?"
+                    "**Scenario:**\n"
+                    "You are building a modular backend service using FastAPI that handles database operations across multiple endpoints.\n\n"
+                    "**Question:**\n"
+                    "How does dependency injection with `Depends` work in FastAPI, and how does the framework manage "
+                    "the lifecycle and automatic cleanup of database sessions or resources per request?"
                 )
                 criteria = [
                     "Yield fixtures and context management with Depends",
@@ -288,9 +298,15 @@ Please output a JSON object with:
                 ]
             elif difficulty == "Hard":
                 q_text = (
-                    "When building a high-throughput FastAPI service, how does Python's asyncio event loop interact "
-                    "with synchronous blocking libraries (such as legacy database drivers or CPU-intensive serialization)? "
-                    "What happens if blocking code runs directly inside an `async def` route, and how do threadpools mitigate this?"
+                    "**Scenario:**\n"
+                    "You are operating a high-throughput FastAPI service under heavy concurrent traffic where certain endpoints "
+                    "rely on synchronous, CPU-bound parsing and legacy database drivers.\n\n"
+                    "**Technical Constraints:**\n"
+                    "- Synchronous blocking calls executed within Python's `asyncio` event loop.\n"
+                    "- Threadpool sizing and latency spikes.\n\n"
+                    "**Question:**\n"
+                    "What happens to the event loop when blocking code runs directly inside an `async def` route versus a regular `def` route? "
+                    "How do threadpools mitigate event loop starvation, and how would you tune worker processes?"
                 )
                 criteria = [
                     "Event loop starvation caused by blocking synchronous I/O",
@@ -300,6 +316,10 @@ Please output a JSON object with:
                 ]
             else:
                 q_text = (
+                    "**Scenario:**\n"
+                    "You are designing an asynchronous backend API in FastAPI that handles high-concurrency read queries "
+                    "while offloading heavy audit-logging tasks.\n\n"
+                    "**Question:**\n"
                     "How does FastAPI's concurrency model handle I/O-bound operations using `async def` endpoints, "
                     "and what are the best practices for structuring non-blocking database queries and background tasks?"
                 )
@@ -312,6 +332,9 @@ Please output a JSON object with:
         elif "react" in comp_lower or "frontend" in comp_lower or "state" in comp_lower:
             if difficulty == "Easy":
                 q_text = (
+                    "**Scenario:**\n"
+                    "You are implementing interactive client components in React that synchronize with an external WebSocket subscription.\n\n"
+                    "**Question:**\n"
                     "In modern React, how does the `useEffect` hook manage side effects and subscriptions? "
                     "Why is a cleanup function critical, and what happens if dependencies are omitted from the dependency array?"
                 )
@@ -322,8 +345,14 @@ Please output a JSON object with:
                 ]
             elif difficulty == "Hard":
                 q_text = (
-                    "In a large-scale React application with high-frequency updates, how does the Fiber reconciler "
-                    "differentiate between synchronous urgent updates and concurrent non-urgent transitions? "
+                    "**Scenario:**\n"
+                    "You are building a real-time analytics dashboard in React with high-frequency telemetry updates "
+                    "and deeply nested chart component trees.\n\n"
+                    "**Technical Challenges:**\n"
+                    "- Differentiating between urgent user inputs and non-urgent background render passes.\n"
+                    "- Preventing UI tearing and render cascades.\n\n"
+                    "**Question:**\n"
+                    "How does React 18's Fiber reconciler differentiate between synchronous urgent updates and concurrent non-urgent transitions? "
                     "How would you prevent UI tearing and redundant render cascades across deep component trees?"
                 )
                 criteria = [
@@ -334,9 +363,12 @@ Please output a JSON object with:
                 ]
             else:
                 q_text = (
-                    "When architecting state management in a multi-view React application, how do you decide between "
-                    "local component state, React Context, and a dedicated server-state caching library? "
-                    "What are the performance implications of frequent context updates?"
+                    "**Scenario:**\n"
+                    "You are architecting the client state architecture for a multi-page web application featuring "
+                    "both complex local form flows and asynchronous server-persisted data.\n\n"
+                    "**Question:**\n"
+                    "When architecting state management in React, how do you decide between local component state, React Context, "
+                    "and a dedicated server-state caching library? What are the performance implications of frequent context updates?"
                 )
                 criteria = [
                     "Context propagation re-rendering all consumer components regardless of prop consumption",
@@ -347,9 +379,16 @@ Please output a JSON object with:
         elif "system design" in comp_lower or "architecture" in comp_lower or "caching" in comp_lower or "database" in comp_lower:
             if difficulty == "Hard":
                 q_text = (
-                    "When designing a distributed caching tier with Redis in front of a relational database, "
-                    "how would you handle cache stampedes (dog-piling), cache penetration, and cache avalanche under sudden spike traffic? "
-                    "Compare cache-aside versus write-through patterns in terms of consistency guarantees."
+                    "**Scenario:**\n"
+                    "You are designing a distributed caching tier with Redis in front of a primary relational database "
+                    "experiencing unpredictable traffic spikes and cache invalidations.\n\n"
+                    "**Technical Challenges:**\n"
+                    "- Cache stampedes (dog-piling) on hot keys.\n"
+                    "- Penetration of non-existent entity queries.\n"
+                    "- Sudden TTL expiration avalanches.\n\n"
+                    "**Question:**\n"
+                    "How would you mitigate cache stampedes, penetration, and avalanche? Compare cache-aside versus "
+                    "write-through patterns in terms of consistency guarantees and failure modes."
                 )
                 criteria = [
                     "Mutual exclusion locks or probabilistic early expiration (XFetch) for cache stampedes",
@@ -359,8 +398,10 @@ Please output a JSON object with:
                 ]
             else:
                 q_text = (
-                    "When scaling a relational database supporting an read-heavy application, what strategies "
-                    "(such as indexing, read replicas, and caching) would you deploy to maintain low query latency, "
+                    "**Scenario:**\n"
+                    "You are scaling a relational database supporting a 95% read-heavy production workload with strict p99 latency SLA targets.\n\n"
+                    "**Question:**\n"
+                    "What strategies (indexing, read replicas, and caching tiers) would you deploy to maintain low query latency, "
                     "and how do you handle replication lag between primary and replica nodes?"
                 )
                 criteria = [
@@ -371,6 +412,9 @@ Please output a JSON object with:
 
         elif "nexus" in comp_lower or "platform" in comp_lower:
             q_text = (
+                "**Scenario:**\n"
+                "You are architecting core platform microservices that handle distributed requests across untrusted network boundaries.\n\n"
+                "**Question:**\n"
                 "Regarding platform engineering standards, how do you design microservices for resilient inter-service "
                 "communication, incorporating circuit breakers, idempotency keys, and structured distributed tracing?"
             )
@@ -384,14 +428,20 @@ Please output a JSON object with:
             # General fallback utilizing retrieved excerpt if available
             if first_excerpt:
                 q_text = (
-                    f"In the context of {competency} (referencing {source_title or 'system standards'}), "
-                    f"how would you approach implementing solutions that satisfy the requirements highlighted in: "
-                    f"'{first_excerpt[:120]}...'? What core trade-offs and operational edge cases must be managed at a {difficulty} level?"
+                    f"**Scenario:**\n"
+                    f"In designing production systems for **{competency}** (referencing *{source_title or 'engineering standards'}*):\n\n"
+                    f"> *\"{first_excerpt[:160]}...\"*\n\n"
+                    f"**Question:**\n"
+                    f"How would you approach implementing an architecture that satisfies these requirements at a **{difficulty}** level? "
+                    f"What core trade-offs, fault-tolerance mechanisms, and operational edge cases must be managed?"
                 )
             else:
                 q_text = (
-                    f"How would you approach designing and implementing a robust solution for '{competency}' "
-                    f"at a {difficulty} level, ensuring high performance, fault tolerance, and clear maintainability?"
+                    f"**Scenario:**\n"
+                    f"You are tasked with leading technical design and implementation for **{competency}** at a **{difficulty}** level.\n\n"
+                    f"**Question:**\n"
+                    f"How would you approach designing and implementing this architecture to ensure low latency, "
+                    f"fault tolerance, and maintainability? Outline your key trade-offs and component boundaries."
                 )
             criteria = [
                 f"Core architectural considerations for {competency}",

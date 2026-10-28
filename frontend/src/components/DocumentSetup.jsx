@@ -143,10 +143,9 @@ export function DocumentSetup({
       {/* Configuration Header */}
       <div className="setup-header">
         <div>
-          <h2 className="setup-title">Document Ingestion & Profile Extraction</h2>
+          <h2 className="setup-title">Candidate Profile & Target Role</h2>
           <p className="setup-subtitle">
-            Upload or paste candidate resume and job specifications. Documents are validated, parsed,
-            and structured into standardized schemas without leaking credentials.
+            Provide candidate resume details and target job specifications to customize your practice interview.
           </p>
         </div>
         <div className="setup-actions">
@@ -311,7 +310,7 @@ export function DocumentSetup({
             className="btn-primary"
             disabled={loading}
           >
-            {loading ? 'Processing & Extracting Profile...' : '✨ Extract Candidate Profile & Job Requirements'}
+            {loading ? 'Analyzing Profile...' : '✨ Prepare Candidate Profile'}
           </button>
         </div>
       </form>
@@ -473,33 +472,33 @@ export function DocumentSetup({
             </div>
           )}
 
-          {/* Stage 1 Completion Next Steps */}
+          {/* Profile Ready Workflow Guidance */}
           <div style={{ marginTop: '24px', padding: '18px 22px', background: 'var(--color-frozen-water)', border: '1px solid var(--color-celadon)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
             <div>
-              <strong style={{ color: 'var(--color-carbon)', fontSize: '15px' }}>✓ Stage 1 Complete: Candidate profile & job specifications extracted!</strong>
+              <strong style={{ color: 'var(--color-carbon)', fontSize: '15px' }}>✓ Profile Configured & Ready</strong>
               <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#334155' }}>
-                Profile data is now loaded. You can verify ChromaDB evidence in Stage 2 or start the interview workspace in Stage 3.
+                Your candidate background and target role are ready. You can begin practicing immediately or browse reference concepts.
               </p>
             </div>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              {onProceedToKnowledge && (
-                <button
-                  type="button"
-                  id="btn-goto-stage2"
-                  className="btn-primary"
-                  onClick={onProceedToKnowledge}
-                >
-                  Proceed to Knowledge Base (Stage 2) →
-                </button>
-              )}
               {onProceedToInterview && (
                 <button
                   type="button"
-                  id="btn-goto-stage3"
-                  className="btn-secondary"
+                  id="btn-goto-interview"
+                  className="btn-primary"
                   onClick={onProceedToInterview}
                 >
-                  Launch Interview Workspace (Stage 3) →
+                  Start Practice Interview →
+                </button>
+              )}
+              {onProceedToKnowledge && (
+                <button
+                  type="button"
+                  id="btn-goto-topics"
+                  className="btn-secondary"
+                  onClick={onProceedToKnowledge}
+                >
+                  Explore Reference Library →
                 </button>
               )}
             </div>

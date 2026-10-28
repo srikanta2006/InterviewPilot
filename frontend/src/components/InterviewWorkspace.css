@@ -410,14 +410,26 @@
 }
 
 .question-body {
-  padding: 0.5rem 0;
+  margin: 0.75rem 0 1.25rem 0;
+  padding: 1.25rem 1.5rem;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-left: 4px solid var(--accent-cyan);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
-.question-text {
-  font-size: 1.15rem;
-  line-height: 1.7;
+.question-text,
+.question-markdown {
+  font-size: 1.08rem;
+  line-height: 1.75;
   color: var(--color-carbon);
-  font-weight: 600;
+  font-weight: 400;
+}
+
+.question-markdown strong {
+  color: var(--color-carbon);
+  font-weight: 700;
 }
 
 .grounding-section, .criteria-section {

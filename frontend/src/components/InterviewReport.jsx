@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { MarkdownView } from './MarkdownView'
 import './InterviewReport.css'
 
 export function InterviewReport({ report, onRestart, onViewHistory }) {
@@ -210,8 +211,8 @@ export function InterviewReport({ report, onRestart, onViewHistory }) {
             className="citations-panel-header"
             onClick={() => setShowAllCitations(!showAllCitations)}
           >
-            <h4>📚 Verified Technical Grounding Citations ({citations_summary.length})</h4>
-            <span className="toggle-label">{showAllCitations ? '▲ Collapse' : '▼ Inspect Citations'}</span>
+            <h4>📚 Referenced Technical Sources ({citations_summary.length})</h4>
+            <span className="toggle-label">{showAllCitations ? '▲ Collapse' : '▼ View References'}</span>
           </div>
 
           {showAllCitations && (
@@ -219,7 +220,7 @@ export function InterviewReport({ report, onRestart, onViewHistory }) {
               <table className="citations-table">
                 <thead>
                   <tr>
-                    <th>Chunk ID</th>
+                    <th>Reference Section</th>
                     <th>Document Source</th>
                     <th>Topic</th>
                     <th>Reference Excerpt</th>
@@ -228,7 +229,7 @@ export function InterviewReport({ report, onRestart, onViewHistory }) {
                 <tbody>
                   {citations_summary.map((cit, cIdx) => (
                     <tr key={cIdx}>
-                      <td><code>{cit.chunk_id}</code></td>
+                      <td><code>Ref #{cIdx + 1}</code></td>
                       <td><strong>{cit.source_name}</strong></td>
                       <td>{cit.topic || 'General'}</td>
                       <td className="cit-excerpt-cell">&quot;{cit.excerpt}&quot;</td>
@@ -277,13 +278,13 @@ export function InterviewReport({ report, onRestart, onViewHistory }) {
                   <div className="question-acc-body">
                     <div className="full-question-prompt">
                       <strong>Question Prompt:</strong>
-                      <p>{q.question_text}</p>
+                      <MarkdownView content={q.question_text} className="report-markdown" />
                     </div>
 
                     {q.candidate_answer && (
                       <div className="candidate-answer-box">
                         <strong>Candidate Response:</strong>
-                        <p>{q.candidate_answer}</p>
+                        <MarkdownView content={q.candidate_answer} className="report-markdown" />
                       </div>
                     )}
 
@@ -301,16 +302,16 @@ export function InterviewReport({ report, onRestart, onViewHistory }) {
                         {q.actionable_feedback && (
                           <div className="q-feedback-box">
                             <strong>💡 Coaching Feedback:</strong>
-                            <p>{q.actionable_feedback}</p>
+                            <MarkdownView content={q.actionable_feedback} className="report-markdown" />
                           </div>
                         )}
 
                         {/* Citations for this question */}
                         {q.citations?.length > 0 && (
                           <div className="q-citations-row">
-                            <span>Grounding Citations:</span>
+                            <span>Referenced Concepts:</span>
                             {q.citations.map((c, cIdx) => (
-                              <code key={cIdx} title={c.excerpt}>{c.chunk_id} ({c.source_name})</code>
+                              <code key={cIdx} title={c.excerpt}>{c.source_name}</code>
                             ))}
                           </div>
                         )}
